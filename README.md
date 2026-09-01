@@ -1,5 +1,6 @@
 # HiroSakuraba.github.io
 
-Hosts [Constitution for a Plural Future](https://hirosakuraba.github.io/).
+GitHub Pages site, served from the `main` branch.
 
-Source file: `index.html`. GitHub Pages serves this repository from the `main` branch.
+- Home: [Constitution for a Plural Future](https://hirosakuraba.github.io/)
+- [The History of You](https://hirosakuraba.github.io/history-of-you/) — `history-of-you/`
