@@ -4,18 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The History of You.</title>
-<style>
-body{margin:0;background:#07100f;color:#eef7f3;font-family:Inter,system-ui,sans-serif}
-.boot{padding:2.2rem;max-width:40rem}
-</style>
+<style>body{margin:0;background:#07100f;color:#eef7f3;font-family:Inter,system-ui,sans-serif}.boot{padding:2.2rem}</style>
 </head>
 <body>
 <div class="boot" id="boot">Loading The History of You…</div>
 <script>
 (async function(){
-  const names = ["part0.txt","part1.txt","part2.txt","part3.txt","part4.txt","part5.txt"];
+  const n = 13;
   const parts = [];
-  for (const name of names) {
+  for (let i = 0; i < n; i++) {
+    const name = "part" + i + ".txt";
     const res = await fetch(name);
     if (!res.ok) throw new Error(name + " " + res.status);
     parts.push(await res.text());
@@ -24,8 +22,7 @@ body{margin:0;background:#07100f;color:#eef7f3;font-family:Inter,system-ui,sans-
   document.write(parts.join(""));
   document.close();
 })().catch(function(err){
-  var el = document.getElementById("boot");
-  el.textContent = "Failed to load the page: " + err;
+  document.getElementById("boot").textContent = "Failed to load the page: " + err;
 });
 </script>
 </body>
