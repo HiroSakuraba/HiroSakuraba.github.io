@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="dark light" name="color-scheme"/>
+<meta content="The unabridged evolutionary history of the human lineage, from Homo sapiens through deep animal and cellular ancestry to LUCA." name="description"/>
+<title>The History of You.</title>
+<style>
+  :root{
+    --bg:#07100f; --panel:#10201d; --text:#eef7f3; --muted:#a9bcb5;
+    --line:#2d4b43; --accent:#a5e7c6; --accent2:#f2cb7e; --warn:#f0a985;
+    --radius:18px; --max:1120px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:
+      radial-gradient(900px 500px at 10% -10%, #16362f 0%, transparent 58%),
+      radial-gradient(800px 520px at 100% 10%, #1d2c3a 0%, transparent 52%),
+      var(--bg);
+    color:var(--text); line-height:1.55;
+  }
+  a{color:var(--accent)}
+  a:hover{color:#d8fbe9}
+  img{max-width:100%;display:block}
+  .wrap{width:min(var(--max),calc(100% - 32px));margin:auto}
+
+  header.hero{padding:52px 0 30px;border-bottom:1px solid var(--line)}
+  .eyebrow{color:var(--accent);text-transform:uppercase;letter-spacing:.14em;
+    font-size:.74rem;font-weight:800;margin-bottom:10px}
+  h1{font-size:clamp(2rem,5.4vw,4.2rem);line-height:.98;margin:.05em 0 .2em;letter-spacing:-.045em}
+  .dek{font-size:clamp(1rem,1.7vw,1.2rem);max-width:760px;color:#d0dfda;margin:0}
+  .note{margin:22px 0 0;padding:15px 17px;border-left:3px solid var(--accent2);
+    background:#18251e;border-radius:0 12px 12px 0;color:#e6eee9;font-size:.95rem}
+  .note.warn{border-left-color:var(--warn);background:#241c17}
+
+  nav.zoom{position:sticky;top:0;z-index:20;background:rgba(7,16,15,.9);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  nav.zoom .wrap{display:flex;gap:8px;overflow:auto;padding:9px 0;scrollbar-width:none}
+  nav.zoom .wrap::-webkit-scrollbar{display:none}
+  nav.zoom a{white-space:nowrap;text-decoration:none;color:#dbe9e4;border:1px solid #29413b;
+    border-radius:999px;padding:6px 11px;font-size:.8rem}
+  nav.zoom a:hover{background:#173029}
+
+  main{padding:34px 0 80px}
+  section{margin:0 0 56px}
+  h2{font-size:clamp(1.5rem,2.8vw,2.2rem);line-height:1.08;letter-spacing:-.02em;margin:0 0 10px}
+  h3{margin:0 0 8px}
+  .lede{color:#d6e3de;max-width:74ch;margin:0 0 16px}
+  .legend{font-size:.83rem;color:var(--muted)}
+
+  /* ---- chain ---- */
+  .toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin:14px 0 14px}
+  input[type=search]{flex:1;min-width:210px;padding:11px 13px;border-radius:11px;
+    border:1px solid var(--line);background:#0b1715;color:var(--text);font:inherit}
+  button{background:#183128;color:#eaf6f1;border:1px solid #35594d;border-radius:11px;
+    padding:10px 12px;font:inherit;font-weight:700;cursor:pointer}
+  button:hover{background:#21443a}
+  button[aria-pressed="true"]{background:#2c5a4b;border-color:#4e8570}
+  .count{font-size:.82rem;color:var(--muted)}
+
+  ol.chain{list-style:none;padding:0;margin:0;border:1px solid var(--line);
+    border-radius:var(--radius);overflow:hidden}
+  ol.chain li.band{background:#0a1614;padding:9px 14px;border-bottom:1px solid #1d332e;
+    border-top:1px solid #1d332e}
+  .band-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;font-weight:800;color:var(--band)}
+  ol.chain li.row{display:grid;grid-template-columns:44px 24px 1fr;align-items:start;
+    border-bottom:1px solid #1a2f2a;background:#0b1715;padding:9px 12px 9px 0;
+    border-left:3px solid var(--band)}
+  ol.chain li.row:last-child{border-bottom:0}
+  ol.chain li.row:nth-of-type(even){background:#0d1b18}
+  .idx{color:#7f968e;text-align:right;padding-right:9px;font-size:.72rem;
+    font-variant-numeric:tabular-nums;padding-top:.28em}
+  .sym{color:var(--band);font-weight:900;padding-top:.05em}
+  .nm{font-weight:700;font-size:1.02rem}
+  .nm a{text-decoration:none;border-bottom:1px solid rgba(165,231,198,.35)}
+  .age{display:block;font-size:.76rem;color:var(--accent2);
+    font-variant-numeric:tabular-nums;margin-top:1px}
+  .gl{display:block;font-size:.9rem;color:#c3d4ce;margin-top:3px;max-width:82ch}
+  .tag{display:inline-block;font-size:.64rem;text-transform:uppercase;letter-spacing:.09em;
+    font-weight:800;padding:2px 7px;border-radius:999px;margin-left:8px;
+    background:#22332c;color:#bfe6d3;border:1px solid #35594d;vertical-align:2px}
+  .tag.warn{background:#33241c;color:#f4c5a6;border-color:#6b4a37}
+  li.row.endpoint .nm{color:var(--accent)}
+  li.row.hit{background:#1f382e;box-shadow:inset 3px 0 0 var(--accent)}
+  li.hide{display:none}
+  body.compact .gl{display:none}
+  body.compact ol.chain li.row{padding-top:5px;padding-bottom:5px}
+
+  /* ---- generic blocks ---- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+  .card{background:linear-gradient(180deg,var(--panel),#0c1816);border:1px solid var(--line);
+    border-radius:var(--radius);padding:20px}
+  .card h3{color:var(--accent)}
+  .card p:last-child{margin-bottom:0}
+
+  .chapter{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.8fr);
+    gap:24px;align-items:start;margin:0 0 40px}
+  .chapter.reverse .visual{order:-1}
+  .chapter h3{font-size:1.35rem;letter-spacing:-.015em}
+  .chapter .num{display:inline-flex;width:28px;height:28px;border-radius:50%;
+    align-items:center;justify-content:center;background:#1d3d34;color:var(--accent);
+    font-weight:800;margin-right:8px;font-size:.85rem}
+  figure.visual{margin:0;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:#111d1a}
+  figure.visual img{width:100%;max-height:360px;object-fit:contain;background:#fff}
+  figure.visual figcaption{padding:11px 13px;font-size:.76rem;color:#becdc8}
+
+  .graft{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;margin:18px 0}
+  .node{background:#101d1a;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center}
+  .arrow{font-size:1.8rem;color:var(--accent2);text-align:center}
+
+  table.forks{width:100%;border-collapse:collapse;margin-top:12px;font-size:.92rem}
+  table.forks th,table.forks td{text-align:left;padding:9px 10px;border-bottom:1px solid #22403a;vertical-align:top}
+  table.forks th{color:var(--accent2);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em}
+
+  footer{border-top:1px solid var(--line);padding:32px 0 60px;color:#9fb2ab;font-size:.84rem}
+  footer h3{color:#cfe0da}
+  footer ul{padding-left:18px;margin:8px 0 18px}
+  footer li{margin-bottom:6px}
+  .srcs{columns:2 300px;column-gap:30px}
+  .srcs li{break-inside:avoid}
+
+  @media(max-width:820px){
+    .chapter,.chapter.reverse{grid-template-columns:1fr}
+    .chapter.reverse .visual{order:initial}
+    .graft{grid-template-columns:1fr}
+    .arrow{transform:rotate(90deg)}
+    ol.chain li.row{grid-template-columns:34px 20px 1fr}
+  }
+  @media print{
+    body{background:#fff;color:#111}
+    nav.zoom,.toolbar{display:none}
+    .card,.node,ol.chain li.row,ol.chain li.band,figure.visual{background:#fff;color:#111;border-color:#bbb}
+    a{color:#111;text-decoration:underline}
+    .gl{color:#333}
+    ol.chain li.row{break-inside:avoid}
+  }
+
+  /* ---- physiology + learning layers ---- */
+  .phys{display:block;font-size:.88rem;color:#b9d6cc;margin-top:6px;padding-left:11px;
+    border-left:2px solid color-mix(in srgb,var(--band) 55%,transparent);max-width:88ch}
+  .phys strong{color:#e8f5ef}
+  body.compact .phys{display:none}
+  .date-legend{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 4px}
+  .date-legend>div{background:#0b1715;border:1px solid var(--line);border-radius:13px;padding:14px}
+  .date-legend strong{display:block;color:var(--accent2);margin-bottom:4px}
+  .timeline{border-left:3px solid #31564b;margin:20px 0 0 14px;padding-left:22px}
+  .trow{position:relative;margin:0 0 18px;padding:0 0 2px}
+  .trow:before{content:"";position:absolute;left:-30px;top:.35em;width:12px;height:12px;border-radius:50%;
+    background:var(--accent);border:3px solid var(--bg)}
+  .when{font-size:.73rem;text-transform:uppercase;letter-spacing:.09em;font-weight:800;color:var(--accent2)}
+  .trow h3{font-size:1.08rem;margin:1px 0 3px;color:#eef7f3}
+  .trow p{margin:0;color:#c7d7d1}
+  .systems{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  .system{background:linear-gradient(180deg,#11221e,#0a1614);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .system h3{color:var(--accent);font-size:1.05rem}
+  .system ol{padding-left:18px;margin:8px 0 0}
+  .system li{margin:6px 0;color:#cbd9d4}
+  .system time{color:var(--accent2);font-size:.78rem;font-weight:800}
+  .evidence{display:inline-block;margin-left:5px;padding:1px 6px;border:1px solid #405b52;border-radius:999px;
+    font-size:.61rem;text-transform:uppercase;letter-spacing:.06em;color:#a9c9bd;vertical-align:1px}
+  .evidence.inferred{border-color:#6b543a;color:#e2c08d}
+  .evidence.contested{border-color:#70463e;color:#eab0a0}
+  .human-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:20px;align-items:start}
+  .compare{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:15px}
+  .compare th,.compare td{padding:9px 10px;border-bottom:1px solid #234039;text-align:left;vertical-align:top}
+  .compare th{font-size:.69rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2)}
+  .callout{background:#101d1a;border:1px solid #315247;border-radius:15px;padding:17px;margin-top:16px}
+  .callout h3{margin:0 0 6px;color:var(--accent)}
+  .mosaic{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:14px}
+  .mosaic div{border:1px solid #2c4941;border-radius:12px;padding:12px;background:#0c1916}
+  .mosaic b{display:block;color:#edf7f3;margin-bottom:3px}
+  @media(max-width:820px){.date-legend,.human-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="hero" id="top">
+<div class="wrap">
+<div class="eyebrow">65 nested clades · about 4.2 billion years · anatomy, physiology and cell biology</div>
+<h1>The History of You.</h1>
+<p class="dek">A guide to the unabridged evolution of the human lineage, from Homo sapiens back through our animal and single-celled ancestry to LUCA, the last universal common ancestor.</p>
+<div class="note"><strong>These are nested groups, not a procession of ancestors.</strong>
+“<em>Homo sapiens</em> ⊂ <em>Homo</em>” means that every human belongs to <em>Homo</em>. The same is true farther down the tree: we are still apes, primates, mammals, synapsids, sarcopterygians and eukaryotes.<br/><br/>
+<strong>Old structures endure.</strong> Bones once used in a jaw now carry sound through the mammalian ear. The bones of a lobe fin survive in the human arm and hand. An ancient bacterial cell survives inside us as the mitochondrion. Evolution works by inheritance, alteration and reuse.</div>
+</div>
+</header>
+<nav aria-label="Sections" class="zoom">
+<div class="wrap"><a href="#start">Start here</a><a href="#humanbuild">Human origins</a><a href="#systems">Body systems</a><a href="#chain">65-clade chain</a><a href="#chapters">Deep transitions</a><a href="#graft">Mitochondrial graft</a><a href="#forks">Contested nodes</a><a href="#sources">Sources</a></div>
+</nav>
+<main>
+<div class="wrap"><section id="start">
+<h2>Three clocks in deep time</h2>
+<p class="lede">Dates on an evolutionary tree can mean different things. A lineage split, the oldest known fossil and the first appearance of a trait are rarely the same date.</p>
+<div class="date-legend">
+<div><strong>1 · Lineage split</strong>The estimated period when two populations began to diverge. Genetic clocks provide ranges, and gene flow may continue after the split begins.</div>
+<div><strong>2 · Oldest fossil</strong>The oldest specimen confidently placed within a clade. It gives a minimum age: the lineage must already have existed when that organism died.</div>
+<div><strong>3 · Trait appearance</strong>An anatomical feature may appear before or after the clade name attached to it. Teeth, limbs, brains, metabolism and reproduction changed on different schedules.</div>
+</div>
+<div class="note"><strong>Reading the dates.</strong> The ranges widen with age. Near the present, fossils and genomes give relatively dense evidence. Near LUCA, events billions of years old must be reconstructed from surviving genes, geochemistry and evolutionary models.</div>
+</section>
+<section id="humanbuild">
+<h2>The last eight million years</h2>
+<p class="lede">The human form did not appear all at once. Upright walking came early. Feet, legs, pelvis, body proportions, heat control, teeth, brains, childhood and culture followed their own courses.</p>
+<div class="human-grid">
+<div>
+<div class="timeline">
+<div class="trow"><div class="when">≈8–6 Ma <span class="evidence inferred">split window</span></div><h3>Human and chimpanzee lineages separate</h3><p>The common ancestor was neither a chimpanzee nor a human. The earliest candidate hominins combine climbing anatomy with reduced canines and hints of upright posture. Genetic evidence also allows for continued gene flow after the first separation.</p></div>
+<div class="trow"><div class="when">≈4.4–3.0 Ma <span class="evidence">fossils</span></div><h3>Walking upright becomes habitual</h3><p><em>Ardipithecus</em> and the australopiths walked on two legs with brains still in the ape range. Pelvis, femur and knee changed while the upper body retained considerable climbing ability. By at least about 3.4 million years ago, <em>A. afarensis</em> had a humanlike transverse arch across the foot.</p></div>
+<div class="trow"><div class="when">≈3.0–2.0 Ma <span class="evidence">anatomical transition</span></div><h3>Early <em>Homo</em> changes diet, travel and energy use</h3><p>Average brain size rose, faces and molars became smaller, tool use and food processing expanded, and life on the ground became more important. The changes did not move in lockstep, which is one reason early <em>Homo</em> remains difficult to classify.</p></div>
+<div class="trow"><div class="when">≈1.9–1.5 Ma <span class="evidence">H. erectus grade</span></div><h3>A long-legged human body takes shape</h3><p>Long legs, shorter arms, large load-bearing joints, springlike feet, a narrow waist and freer shoulders made long-distance walking—and probably endurance running—far more efficient. Brain volume commonly entered the 700–1,000 cm³ range. Reduced body hair and greatly increased sweating are plausible by this period, but skin leaves no fossil record.</p></div>
+<div class="trow"><div class="when">≈1.0–0.4 Ma <span class="evidence inferred">multiple Homo lineages</span></div><h3>Brains, childhood and technology expand</h3><p>Several <em>Homo</em> populations reached brain volumes around or above 1,100 cm³. Fire, hunting, food processing and social learning increasingly changed diet, daily energy use and development. Culture itself had become part of the environment in which natural selection acted.</p></div>
+<div class="trow"><div class="when">≈765–550 ka <span class="evidence inferred">genomic split</span></div><h3>The sapiens line parts from Neanderthals and Denisovans</h3><p>The separation was incomplete. Later interbreeding left Neanderthal DNA in living populations outside Africa and Denisovan ancestry in several populations of Asia and Oceania. The human family tree contains branches that divided and met again.</p></div>
+<div class="trow"><div class="when">≈315–200 ka <span class="evidence">fossils</span></div><h3><em>Homo sapiens</em> appears in Africa</h3><p>Early members of our species had a relatively modern face while retaining some older cranial proportions. The rounded braincase of living humans developed later. A true chin, lighter brow ridges, a more gracile skeleton and a reorganized skull became characteristic of later <em>H. sapiens</em>.</p></div>
+</div>
+<div class="callout"><h3>A larger brain was only part of the change</h3><p>Fossil averages show the broad rise: australopiths about 400–550 cm³; early <em>Homo</em> often 500–750 cm³; <em>H. erectus</em> broadly 600–1,250 cm³; later Middle Pleistocene <em>Homo</em> about 1,100–1,400 cm³; Neanderthals and Pleistocene <em>H. sapiens</em> often 1,300–1,500+ cm³. The ranges overlap. Brain organization, development, language, learning and culture cannot be reduced to cranial volume.</p></div>
+</div>
+<div>
+<figure class="visual">
+<img alt="Comparison of chimpanzee, Australopithecus afarensis and human pelvis and birth canal" src="https://commons.wikimedia.org/wiki/Special:Redirect/file/A_Visual_Comparison_of_the_Pelvis_and_Bony_Birth_Canal_Vs._the_Size_of_Infant_Skull_in_Primate_Species.png"/>
+<figcaption>Pelvis and birth-canal comparison in chimpanzee, <em>Australopithecus afarensis</em> and <em>Homo sapiens</em>. ArchaeoMouse, CC BY-SA 4.0. The human pelvis bears the competing demands of upright walking, childbirth and body form.</figcaption>
+</figure>
+<table class="compare">
+<thead><tr><th>System</th><th>Chimpanzee-like ancestral condition</th><th>Human-line transformation</th></tr></thead>
+<tbody>
+<tr><td>Pelvis</td><td>Longer, narrower ilia suited to climbing and quadrupedal loading</td><td>Short, broad, rotated ilia stabilize the trunk over one supporting leg; birth canal is correspondingly complex</td></tr>
+<tr><td>Femur/knee</td><td>Less valgus alignment</td><td>Femur angles inward, placing knees under the center of mass during single-leg stance</td></tr>
+<tr><td>Foot</td><td>Mobile, grasp-capable midfoot and divergent hallux</td><td>Adducted big toe, stiff transverse/longitudinal arches, enlarged heel and elastic energy storage</td></tr>
+<tr><td>Spine</td><td>Shorter lumbar region and different trunk balance</td><td>Lumbar lordosis and an S-shaped spine balance the trunk over the hips</td></tr>
+<tr><td>Shoulder</td><td>Powerful climbing/suspensory system</td><td>Retains exceptional mobility; in Homo it becomes more mechanically decoupled from head/neck during running and throwing</td></tr>
+<tr><td>Skin/heat</td><td>Dense body hair; less dependence on whole-body evaporative cooling</td><td>Relative hair reduction plus very high eccrine-sweating capacity makes humans exceptional heat-dissipating endurance mammals</td></tr>
+<tr><td>Brain/life history</td><td>Great-ape brain and juvenile period</td><td>Large energetically expensive brain, prolonged development, long childhood and extreme dependence on teaching/social learning</td></tr>
+</tbody>
+</table>
+<p class="legend">Bones record locomotion directly. Hair, sweat glands, vocal anatomy and many developmental changes do not fossilize, so their dates are necessarily less certain.</p>
+</div>
+</div>
+</section><section id="chain">
+<h2>The full chain</h2>
+<p class="lede">Sixty-five entries lead from our species to the last universal common ancestor. Each gives an approximate date range, the wider family that joins the tree, and the principal anatomical or physiological features carried at that level.</p>
+<div class="toolbar">
+<input aria-label="Filter clades" id="search" placeholder="Filter — e.g. Mammalia, Holozoa, Asgard" type="search"/>
+<button aria-pressed="false" id="toggleGloss">Names only</button>
+<button aria-pressed="false" id="onlyContested">Contested only</button>
+<button id="reset">Reset</button>
+<span class="count" id="count"></span>
+</div>
+<ol class="chain" id="chainList">
+<li class="band" data-nofilter="1" style="--band:#a5e7c6"><span class="band-label">Humans and apes</span></li>
+<li class="row apes endpoint" style="--band:#a5e7c6"><span class="idx">1</span><span class="sym">●</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Human" rel="noopener" target="_blank">Homo sapiens</a></span><span class="age">species emergence ≈315–200 ka; split from Neanderthal/Denisovan lineage ≈550–765 ka</span><span class="gl">Our species. The oldest fossils generally assigned to it come from Jebel Irhoud, Morocco.</span><span class="phys"><strong>Body:</strong> a gracile skeleton, reduced face and brow ridges, a true chin, high rounded cranial vault and a globular adult braincase. <strong>Life history:</strong> an unusually long childhood, high brain energy demand, extreme reliance on social learning, language and cumulative culture. Early sapiens already possessed much of the modern anatomy, while the rounded cranial form of living humans appeared gradually.</span></span></li>
+<li class="row apes" style="--band:#a5e7c6"><span class="idx">2</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Homo" rel="noopener" target="_blank">Homo</a></span><span class="age">stem/genus emergence ≈3.0–2.5 Ma; earliest widely cited Homo fossil ≈2.8 Ma</span><span class="gl">Genus. Also contains H. erectus, H. neanderthalensis, H. floresiensis, H. naledi and others.</span><span class="phys"><strong>Body and behavior:</strong> Larger brains on average accompanied smaller chewing structures, longer legs, more efficient walking, finer hand control and a wider ecological range. By early <em>H. erectus</em>, body proportions were markedly more humanlike. Later species such as <em>H. floresiensis</em> and <em>H. naledi</em> show how varied the genus remained.</span></span></li>
+<li class="row apes contested" style="--band:#a5e7c6"><span class="idx">3</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Australopithecine" rel="noopener" target="_blank">Hominina</a></span><span class="tag warn">contested</span><span class="age">definition-dependent; roughly ≈4–7 Ma if used for the Australopithecus + Homo subtribe</span><span class="gl">Subtribe holding Homo and, in most treatments, Australopithecus. Rank and contents vary between authors; some classifications drop the name.</span><span class="phys"><strong>Locomotion:</strong> habitual terrestrial bipedality becomes increasingly established across australopiths and early Homo, while substantial climbing ability persists. Pelvis, femur, knee and foot changed at different rates over a long span of time.</span></span></li>
+<li class="row apes" style="--band:#a5e7c6"><span class="idx">4</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Hominini" rel="noopener" target="_blank">Hominini</a></span><span class="age">human–Pan lineage split ≈6–8 Ma (some genetic models extend older)</span><span class="gl">The branch left after the split from Pan (chimpanzees and bonobos).</span><span class="phys"><strong>Early hominins:</strong> Reduced canines and anatomical signs of upright posture appear near the period of the human–chimpanzee split. Fully habitual bipedality followed over millions of years.</span></span></li>
+<li class="row apes" style="--band:#a5e7c6"><span class="idx">5</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Homininae" rel="noopener" target="_blank">Homininae</a></span><span class="age">gorilla lineage split ≈8–12 Ma</span><span class="gl">Adds gorillas.</span><span class="phys"><strong>African apes:</strong> African apes and humans inherited relatively large brains, powerful shoulders and flexible forelimbs. Gorillas, chimpanzees, bonobos and hominins later specialized those bodies in different ways.</span></span></li>
+<li class="row apes" style="--band:#a5e7c6"><span class="idx">6</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Hominidae" rel="noopener" target="_blank">Hominidae</a></span><span class="age">orangutan lineage split ≈12–19 Ma</span><span class="gl">Great apes. Adds orangutans.</span><span class="phys"><strong>Great apes:</strong> Large bodies, slow growth and reproduction, enlarged brains, dexterous hands and highly mobile shoulders characterize the great-ape lineage. Suspensory and climbing abilities remain important even where later lineages become terrestrial.</span></span></li>
+<li class="row apes" style="--band:#a5e7c6"><span class="idx">7</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Ape" rel="noopener" target="_blank">Hominoidea</a></span><span class="age">great-ape–gibbon split ≈17–22 Ma</span><span class="gl">All apes. Adds gibbons.</span><span class="phys"><strong>Apes:</strong> external tail loss, a broad shallow thorax, dorsally placed shoulder blades and exceptionally mobile shoulders. A hominoid-specific change affecting <em>TBXT</em> splicing is now a plausible contributor to tail loss, which occurred around the ape stem.</span></span></li>
+<li class="row apes" style="--band:#a5e7c6"><span class="idx">8</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Catarrhini" rel="noopener" target="_blank">Catarrhini</a></span><span class="age">ape–Old World monkey split ≈25–32 Ma</span><span class="gl">Old World anthropoids: apes plus Old World monkeys. Downward-facing nostrils, 2·1·2·3 dental formula.</span><span class="phys"><strong>Face, teeth and vision:</strong> downward-facing nostrils and the 2·1·2·3 dental formula. A duplication of the long-wavelength opsin lineage in stem catarrhines produced routine red–green trichromatic vision in Old World monkeys and apes.</span></span></li>
+<li class="band" data-nofilter="1" style="--band:#9fe0d4"><span class="band-label">Primates and mammals</span></li>
+<li class="row primates" style="--band:#9fe0d4"><span class="idx">9</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Simian" rel="noopener" target="_blank">Simiiformes</a></span><span class="age">catarrhine–platyrrhine split ≈36–45 Ma</span><span class="gl">Adds New World monkeys, which reached South America across the Atlantic.</span><span class="phys"><strong>Eyes and brain:</strong> complete bony closure behind the eye, stronger reliance on vision, enlarged brains relative to many earlier primates, and a fused mandibular symphysis. Olfaction becomes relatively less dominant.</span></span></li>
+<li class="row primates" style="--band:#9fe0d4"><span class="idx">10</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Haplorhini" rel="noopener" target="_blank">Haplorhini</a></span><span class="age">tarsier–anthropoid split ≈55–65 Ma</span><span class="gl">Adds tarsiers. Dry-nosed primates; the wet rhinarium is gone.</span><span class="phys"><strong>Dry-nosed primates:</strong> loss of the wet rhinarium, greater visual specialization and changes in retinal/orbital anatomy. The clade includes tarsiers as well as anthropoids, so not every feature is equally expressed in every branch.</span></span></li>
+<li class="row primates" style="--band:#9fe0d4"><span class="idx">11</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Primate" rel="noopener" target="_blank">Primates</a></span><span class="age">strepsirrhine–haplorhine split ≈65–80 Ma</span><span class="gl">Adds lemurs, lorises and galagos (Strepsirrhini).</span><span class="phys"><strong>Life in the trees:</strong> Grasping hands and feet, nails on most digits, tactile pads, forward-facing eyes with stereoscopic vision, flexible joints and enlarged visual and association areas of the brain suited life among branches.</span></span></li>
+<li class="row primates contested" style="--band:#9fe0d4"><span class="idx">12</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Primatomorpha" rel="noopener" target="_blank">Primatomorpha</a></span><span class="tag warn">contested</span><span class="age">primate–colugo split ≈75–85 Ma if Primatomorpha is recovered</span><span class="gl">Adds colugos. Contested: several analyses instead pair colugos with treeshrews as Sundatheria.</span><span class="phys"><strong>Primates and colugos:</strong> Primates and colugos share features of highly specialized arboreal feet and mobile ankles. This node chiefly records their relationship, not the origin of a distinctive human organ.</span></span></li>
+<li class="row primates" style="--band:#9fe0d4"><span class="idx">13</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Euarchonta" rel="noopener" target="_blank">Euarchonta</a></span><span class="age">treeshrew branch ≈80–95 Ma</span><span class="gl">Adds treeshrews (Scandentia).</span><span class="phys"><strong>Early euarchontans:</strong> Primates, colugos and treeshrews share adaptations to complex arboreal habitats. The clade is chiefly important for establishing their relationship.</span></span></li>
+<li class="row primates" style="--band:#9fe0d4"><span class="idx">14</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Euarchontoglires" rel="noopener" target="_blank">Euarchontoglires</a></span><span class="age">Euarchonta–Glires split ≈90–100 Ma</span><span class="gl">Adds rodents, rabbits and hares (Glires).</span><span class="phys"><strong>Placental inheritance:</strong> By this point the lineage already had hair, lactation, endothermy, a neocortex, a four-chambered heart and the basic therian reproductive system.</span></span></li>
+<li class="row primates" style="--band:#9fe0d4"><span class="idx">15</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Boreoeutheria" rel="noopener" target="_blank">Boreoeutheria</a></span><span class="age">Euarchontoglires–Laurasiatheria split ≈90–105 Ma</span><span class="gl">Adds Laurasiatheria: carnivorans, ungulates, bats, shrews, pangolins.</span><span class="phys"><strong>Placental divergence:</strong> The ancestor already possessed the main placental mammal systems later carried into primates, rodents, carnivores, bats, ungulates and many other lines.</span></span></li>
+<li class="row primates" style="--band:#9fe0d4"><span class="idx">16</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Placentalia" rel="noopener" target="_blank">Placentalia</a></span><span class="age">crown placental root ≈86–100 Ma in many molecular clocks; fossil interpretation remains disputed</span><span class="gl">Crown placentals. Adds Afrotheria and Xenarthra. Whether the crown group predates the end-Cretaceous extinction is still argued.</span><span class="phys"><strong>Reproduction:</strong> extended intrauterine development using a chorioallantoic placenta becomes the defining living-grade strategy, with elaborate maternal–fetal exchange and immune tolerance. Placental structure itself then diversifies enormously among lineages.</span></span></li>
+<li class="row primates" style="--band:#9fe0d4"><span class="idx">17</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Eutheria" rel="noopener" target="_blank">Eutheria</a></span><span class="age">therian split is Jurassic; eutherian stem ≥125 Ma, with a proposed ≈160 Ma fossil placement debated</span><span class="gl">Placentals plus their extinct stem relatives, such as Juramaia.</span><span class="phys"><strong>Toward placentals:</strong> dental and ankle characters move toward the placental condition, while reproductive anatomy was still evolving. Fossils show that “placental-like” anatomy long predates many crown placental groups.</span></span></li>
+<li class="row primates" style="--band:#9fe0d4"><span class="idx">18</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Theria" rel="noopener" target="_blank">Theria</a></span><span class="age">metatherian–eutherian split ≈160–180 Ma; broader clocks ≈140–190 Ma</span><span class="gl">Adds marsupials (Metatheria). Live birth rather than eggs.</span><span class="phys"><strong>Live-bearing mammals:</strong> marsupials and placentals share viviparity and highly specialized tribosphenic molars; embryonic development shifts decisively toward maternal gestation compared with egg-laying monotremes.</span></span></li>
+<li class="row primates" style="--band:#9fe0d4"><span class="idx">19</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Mammal" rel="noopener" target="_blank">Mammalia</a></span><span class="age">monotreme–therian crown split ≈180–220 Ma</span><span class="gl">Crown mammals. Adds monotremes, which kept egg-laying.</span><span class="phys"><strong>Mammalian anatomy:</strong> Hair, milk, endothermic physiology, precise tooth occlusion, a single dentary lower jaw and three middle-ear bones characterize crown mammals. Most of these traits began evolving earlier among mammal-line ancestors.</span></span></li>
+<li class="row primates" style="--band:#9fe0d4"><span class="idx">20</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Mammaliaformes" rel="noopener" target="_blank">Mammaliaformes</a></span><span class="age">origin ≈200–225 Ma</span><span class="gl">Adds Morganucodon, docodonts and other stem forms already carrying the dentary–squamosal jaw joint.</span><span class="phys"><strong>From jaw to ear:</strong> the dentary–squamosal jaw joint is established while the old jaw-joint bones become increasingly dedicated to hearing. Small bodies, precise occlusion and high-frequency hearing become characteristic of early mammaliaforms.</span></span></li>
+<li class="row primates" style="--band:#9fe0d4"><span class="idx">21</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Mammaliamorpha" rel="noopener" target="_blank">Mammaliamorpha</a></span><span class="age">origin ≈215–235 Ma</span><span class="gl">Adds tritylodontids, which survived into the Cretaceous alongside early mammals.</span><span class="phys"><strong>Feeding and growth:</strong> increasingly precise chewing, enlarged dentary, reduced postdentary bones and likely elevated metabolic rates. The familiar mammalian body was under construction well before true mammals.</span></span></li>
+<li class="row primates" style="--band:#9fe0d4"><span class="idx">22</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Probainognathia" rel="noopener" target="_blank">Probainognathia</a></span><span class="age">origin ≈240–255 Ma</span><span class="gl">One of the two great cynodont branches; the other, Cynognathia, produced large herbivores and left no descendants.</span><span class="phys"><strong>Chewing and hearing:</strong> the dentary expands and the postdentary jaw bones shrink; tooth occlusion becomes more exact. These changes improve chewing while freeing ancestral jaw elements for an auditory role.</span></span></li>
+<li class="band" data-nofilter="1" style="--band:#9fcde8"><span class="band-label">Synapsids</span></li>
+<li class="row synapsids" style="--band:#9fcde8"><span class="idx">23</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Cynodontia" rel="noopener" target="_blank">Cynodontia</a></span><span class="age">origin ≈255–270 Ma</span><span class="gl">Cynodonts. Secondary bony palate, differentiated teeth, shrinking postdentary bones.</span><span class="phys"><strong>Breathing and posture:</strong> A secondary palate allowed breathing while food was processed. Teeth became strongly differentiated, the limbs moved closer beneath the body, and the nasal cavity expanded. Nasal anatomy and bone growth point toward greater sustained activity and increasingly mammalian temperature control.</span></span></li>
+<li class="row synapsids" style="--band:#9fcde8"><span class="idx">24</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Eutheriodontia" rel="noopener" target="_blank">Eutheriodontia</a></span><span class="age">origin ≈260–270 Ma</span><span class="gl">Cynodonts plus therocephalians.</span><span class="phys"><strong>Theriodont physiology:</strong> improved jaw mechanics, more specialized teeth and increasingly erect posture support higher activity. Cynodonts and therocephalians explore different versions of the increasingly mammal-like feeding/respiratory complex.</span></span></li>
+<li class="row synapsids" style="--band:#9fcde8"><span class="idx">25</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Theriodontia" rel="noopener" target="_blank">Theriodontia</a></span><span class="age">origin ≈265–275 Ma</span><span class="gl">Adds gorgonopsians, the sabre-toothed predators of the late Permian.</span><span class="phys"><strong>Jaws and teeth:</strong> enlarged temporal openings and stronger jaw adductors allow faster, more powerful bites; teeth differentiate strongly by function. Mammalian-style jaw architecture is becoming recognizable.</span></span></li>
+<li class="row synapsids" style="--band:#9fcde8"><span class="idx">26</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Therapsida" rel="noopener" target="_blank">Therapsida</a></span><span class="age">origin ≈275–290 Ma</span><span class="gl">Adds dicynodonts and the other therapsid branches. Limbs move under the body; the temporal opening enlarges.</span><span class="phys"><strong>Posture and metabolism:</strong> limbs become more upright, the body is carried farther off the ground and lateral trunk bending is reduced. These changes loosen the mechanical conflict between running and breathing and are part of the long transition toward mammalian endothermy.</span></span></li>
+<li class="row synapsids" style="--band:#9fcde8"><span class="idx">27</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Sphenacodontia" rel="noopener" target="_blank">Sphenacodontia</a></span><span class="age">origin ≈300–315 Ma</span><span class="gl">Adds Dimetrodon and its relatives.</span><span class="phys"><strong>Skull mechanics:</strong> the synapsid temporal opening and jaw musculature enlarge, allowing more powerful, controlled bites. Canine-like regional tooth differentiation becomes pronounced in several lineages.</span></span></li>
+<li class="row synapsids" style="--band:#9fcde8"><span class="idx">28</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Eupelycosauria" rel="noopener" target="_blank">Eupelycosauria</a></span><span class="age">origin ≈305–320 Ma</span><span class="gl">Most of the animals traditionally lumped together as pelycosaurs.</span><span class="phys"><strong>Feeding:</strong> larger temporal fenestrae and reorganized jaw muscles increase bite efficiency; herbivorous and predatory specializations proliferate. These are still sprawling-to-semi-sprawling amniotes, not mammals.</span></span></li>
+<li class="row synapsids" style="--band:#9fcde8"><span class="idx">29</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Synapsida" rel="noopener" target="_blank">Synapsida</a></span><span class="age">synapsid stem/crown region ≈315–325 Ma</span><span class="gl">The mammal side of Amniota, defined by one temporal opening behind the eye socket. Humans are synapsids; the group never stopped.</span><span class="phys"><strong>The synapsid skull:</strong> one temporal fenestra behind each eye opens space for larger jaw muscles and establishes the basic synapsid cranial architecture inherited by mammals.</span></span></li>
+<li class="row synapsids" style="--band:#9fcde8"><span class="idx">30</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Amniote" rel="noopener" target="_blank">Amniota</a></span><span class="age">synapsid–sauropsid split ≈315–330 Ma</span><span class="gl">Split from Sauropsida, the reptile and bird side. The amniotic egg breaks reproduction free of standing water.</span><span class="phys"><strong>Reproduction on land:</strong> amnion, chorion and allantois protect and ventilate the embryo; internal fertilization, more water-resistant keratinized skin, stronger rib-based ventilation and improved water conservation support fully terrestrial life.</span></span></li>
+<li class="row synapsids contested" style="--band:#9fcde8"><span class="idx">31</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Reptiliomorpha" rel="noopener" target="_blank">Reptiliomorpha</a></span><span class="tag warn">contested</span><span class="age">≈330–350 Ma, strongly definition-dependent</span><span class="gl">Name used two ways. Under the phylogenetic definition it covers every tetrapod closer to amniotes than to living amphibians; under the older usage it excludes amniotes themselves.</span><span class="phys"><strong>Life on land:</strong> stronger vertebrae, limb girdles and feet support locomotion away from water. Because the name is defined inconsistently, assigning one physiological package to it would be false precision.</span></span></li>
+<li class="band" data-nofilter="1" style="--band:#b9c3ef"><span class="band-label">Tetrapods</span></li>
+<li class="row tetrapods" style="--band:#b9c3ef"><span class="idx">32</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Tetrapod" rel="noopener" target="_blank">Tetrapoda</a></span><span class="age">crown tetrapod split ≈350–370 Ma; tetrapod-grade fossils and tracks are older</span><span class="gl">Four-limbed vertebrates with digits. The oldest tetrapod-grade trackways are older still, around 390 Ma.</span><span class="phys"><strong>Four limbs:</strong> digits, load-bearing limb girdles, a neck, sacral attachment of the pelvis and lungs as the dominant adult respiratory organ. Circulation is reorganized around distinct pulmonary and systemic pathways, though full separation evolves later.</span></span></li>
+<li class="row tetrapods" style="--band:#b9c3ef"><span class="idx">33</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Stegocephali" rel="noopener" target="_blank">Stegocephali</a></span><span class="age">≈365–390 Ma depending definition</span><span class="gl">Adds Ichthyostega, Acanthostega and other digit-bearing animals that were still largely aquatic.</span><span class="phys"><strong>Digits:</strong> wrists/ankles, digits and strengthened girdles appear while many animals remain aquatic. The shoulder separates from the skull, creating a neck; the pelvis and vertebral column increasingly transmit body weight.</span></span></li>
+<li class="row tetrapods" style="--band:#b9c3ef"><span class="idx">34</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Elpistostegalia" rel="noopener" target="_blank">Elpistostegalia</a></span><span class="age">≈380–390 Ma</span><span class="gl">Adds Tiktaalik, Elpistostege and Panderichthys: flat skulls, mobile necks, fins with a limb-like internal skeleton.</span><span class="phys"><strong>Shallow-water anatomy:</strong> flattened skull, dorsally placed eyes, mobile neck, stronger ribs and limb-like fin skeleton. Air breathing and bottom-supported locomotion become increasingly important before true terrestrial walking.</span></span></li>
+<li class="row tetrapods" style="--band:#b9c3ef"><span class="idx">35</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Eotetrapodiformes" rel="noopener" target="_blank">Eotetrapodiformes</a></span><span class="age">≈390–405 Ma</span><span class="gl">Adds Eusthenopteron and relatives.</span><span class="phys"><strong>Fin skeleton:</strong> humerus, radius/ulna homologues and stronger pectoral structures become more limb-like; ribs and axial skeleton strengthen for shallow-water support and air breathing.</span></span></li>
+<li class="row tetrapods" style="--band:#b9c3ef"><span class="idx">36</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Tetrapodomorpha" rel="noopener" target="_blank">Tetrapodomorpha</a></span><span class="age">≈400–420 Ma</span><span class="gl">Every lobe-finned vertebrate closer to tetrapods than to lungfish.</span><span class="phys"><strong>Fin-to-limb anatomy:</strong> robust lobe fins carry a one-bone/two-bone internal pattern and increasingly mobile joints. Lungs and internal air-breathing structures are already part of the broader lineage.</span></span></li>
+<li class="row tetrapods" style="--band:#b9c3ef"><span class="idx">37</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Rhipidistia" rel="noopener" target="_blank">Rhipidistia</a></span><span class="age">lungfish–tetrapod-line split ≈410–425 Ma</span><span class="gl">Adds lungfish (Dipnoi), the closest living relatives of tetrapods among fishes.</span><span class="phys"><strong>Air breathing:</strong> the lungfish–tetrapod side of the lobe-fin tree preserves lungs and a robust internal appendicular skeleton. Our lungs are transformations of a very old osteichthyan gas-exchange system, not a land-only invention.</span></span></li>
+<li class="row tetrapods" style="--band:#b9c3ef"><span class="idx">38</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Sarcopterygii" rel="noopener" target="_blank">Sarcopterygii</a></span><span class="age">coelacanth–rhipidistian split ≈420–435 Ma</span><span class="gl">Lobe-finned vertebrates. Adds coelacanths, and marks the split from the ray-finned fishes.</span><span class="phys"><strong>Lobe fins:</strong> fins contain substantial muscle and internal bones homologous to the humerus/femur and more distal elements. Paired lungs occur broadly in early sarcopterygian-grade anatomy.</span></span></li>
+<li class="band" data-nofilter="1" style="--band:#c8b8ef"><span class="band-label">Vertebrates and chordates</span></li>
+<li class="row vertebrates" style="--band:#c8b8ef"><span class="idx">39</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Osteichthyes" rel="noopener" target="_blank">Osteichthyes / Euteleostomi</a></span><span class="age">ray-fin–lobe-fin split ≈425–440 Ma</span><span class="gl">Bony vertebrates. Adds Actinopterygii, which is most fish species alive. In current usage Euteleostomi and crown Osteichthyes name the same group.</span><span class="phys"><strong>Bony vertebrates:</strong> extensive endochondral/dermal bone, a bony gill cover in early forms, and a pharyngeal gas organ lineage that becomes lungs in sarcopterygians and swim bladders in many ray-fins.</span></span></li>
+<li class="row vertebrates contested" style="--band:#c8b8ef"><span class="idx">40</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Teleostomi" rel="noopener" target="_blank">Teleostomi</a></span><span class="tag warn">contested</span><span class="age">historical/unstable grouping; roughly ≈430–445 Ma if used</span><span class="gl">Bony vertebrates plus acanthodians. Recent work recovers acanthodians as stem chondrichthyans, so this name is falling out of use.</span><span class="phys"><strong>Historical grouping:</strong> because acanthodian placement has shifted, there is no defensible unique physiology to teach here. It is useful mainly as an example of how phylogenies get rewritten.</span></span></li>
+<li class="row vertebrates" style="--band:#c8b8ef"><span class="idx">41</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Gnathostomata" rel="noopener" target="_blank">Eugnathostomata</a></span><span class="age">crown-jawed-vertebrate region ≈440–455 Ma</span><span class="gl">Crown jawed vertebrates plus close stem forms. English Wikipedia folds it into the Gnathostomata article.</span><span class="phys"><strong>Jawed vertebrates:</strong> refined jaw suspension, paired fins and mineralized oral structures are established. The exact boundary varies with fossil placement.</span></span></li>
+<li class="row vertebrates" style="--band:#c8b8ef"><span class="idx">42</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Gnathostomata" rel="noopener" target="_blank">Gnathostomata</a></span><span class="age">jawed-vertebrate radiation ≈440–460 Ma</span><span class="gl">Jawed vertebrates. Adds sharks, rays and chimaeras.</span><span class="phys"><strong>Jaws and immunity:</strong> jaws evolve from anterior pharyngeal-arch structures; paired pectoral and pelvic appendages become standard. Jawed vertebrates also acquire the immunoglobulin/T-cell-receptor, MHC and V(D)J-recombination adaptive immune system still used by humans.</span></span></li>
+<li class="row vertebrates" style="--band:#c8b8ef"><span class="idx">43</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Vertebrate" rel="noopener" target="_blank">Vertebrata</a></span><span class="age">jawless–jawed vertebrate split ≈500–520 Ma</span><span class="gl">Adds lampreys and hagfish. Vertebral elements, a cranium, neural crest.</span><span class="phys"><strong>The vertebrate head:</strong> a cranium, vertebral elements, enlarged brain and paired sense organs. Migratory neural crest and cranial placodes generate much of the face, peripheral nerves, pigment cells, teeth, inner ear, olfactory structures and parts of the heart/endocrine system. Vertebrates also possess ancient B-like and T-like immune-cell lineages.</span></span></li>
+<li class="row vertebrates" style="--band:#c8b8ef"><span class="idx">44</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Olfactores" rel="noopener" target="_blank">Olfactores</a></span><span class="age">tunicate–vertebrate split ≈520–560 Ma</span><span class="gl">Adds tunicates. Sea squirts, not lancelets, are the closest living relatives of vertebrates.</span><span class="phys"><strong>Vertebrates and tunicates:</strong> the closest living non-vertebrate cousins are sea squirts, whose larvae retain a notochord and dorsal nerve cord. Many vertebrate developmental systems have precursor states in this shared ancestry.</span></span></li>
+<li class="row vertebrates" style="--band:#c8b8ef"><span class="idx">45</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Chordate" rel="noopener" target="_blank">Chordata</a></span><span class="age">cephalochordate–olfactorian split ≈550–600 Ma</span><span class="gl">Adds lancelets. Notochord, dorsal hollow nerve cord, pharyngeal slits, post-anal tail.</span><span class="phys"><strong>Chordate body plan:</strong> notochord, dorsal hollow nerve cord, segmented trunk musculature, pharyngeal slits, endostyle/thyroid homology and a post-anal muscular tail. This is the deep architecture still visible in a human embryo.</span></span></li>
+<li class="band" data-nofilter="1" style="--band:#efb8d8"><span class="band-label">Animals and their single-celled relatives</span></li>
+<li class="row animals contested" style="--band:#efb8d8"><span class="idx">46</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Deuterostome" rel="noopener" target="_blank">Deuterostomia</a></span><span class="tag warn">contested</span><span class="age">chordate–ambulacrarian split ≈580–650 Ma; topology itself is under challenge</span><span class="gl">Adds echinoderms and hemichordates. The textbook blastopore-becomes-anus definition no longer holds up, and the monophyly of the group is under active challenge.</span><span class="phys"><strong>A disputed branch:</strong> blastopore fate and cleavage pattern are variable, and even deuterostome monophyly has been challenged. Pharyngeal slits and regional body-patterning systems may reach into this ancestry, but there is no single clean physiological pattern unique to all deuterostomes.</span></span></li>
+<li class="row animals" style="--band:#efb8d8"><span class="idx">47</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Nephrozoa" rel="noopener" target="_blank">Nephrozoa</a></span><span class="age">protostome–deuterostome region ≈600–650 Ma</span><span class="gl">Adds Protostomia: arthropods, molluscs, annelids, nematodes and the rest.</span><span class="phys"><strong>Organ systems:</strong> the protostome–deuterostome ancestor likely had mesoderm, a directional body, regionalized nervous tissue, gut and excretory/osmoregulatory systems. Exact reconstruction remains uncertain.</span></span></li>
+<li class="row animals" style="--band:#efb8d8"><span class="idx">48</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Bilateria" rel="noopener" target="_blank">Bilateria</a></span><span class="age">bilaterian crown ≈600–700 Ma</span><span class="gl">Adds Xenacoelomorpha. Bilateral symmetry, a through-gut, mesoderm.</span><span class="phys"><strong>Bilateral bodies:</strong> bilateral symmetry, three germ layers, mesoderm, Hox-patterned body axes and directional locomotion transform animal physiology. Centralized nervous systems, muscles and a through-gut diversify from this grade.</span></span></li>
+<li class="row animals" style="--band:#efb8d8"><span class="idx">49</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/ParaHoxozoa" rel="noopener" target="_blank">ParaHoxozoa</a></span><span class="age">≈650–750 Ma; sensitive to the animal-root topology</span><span class="gl">Adds cnidarians and placozoans.</span><span class="phys"><strong>Developmental patterning:</strong> cnidarian/bilaterian-grade lineages deploy richer axial patterning, signaling, contractile and neural systems. The exact ancestral state depends on where ctenophores and sponges sit at the animal root.</span></span></li>
+<li class="row animals contested" style="--band:#efb8d8"><span class="idx">50</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Eumetazoa" rel="noopener" target="_blank">Eumetazoa</a></span><span class="tag warn">contested</span><span class="age">≈650–800 Ma; exact content depends on sponge/ctenophore placement</span><span class="gl">Animals with true tissues. Its exact contents depend on whether sponges or ctenophores branch off first, which is not settled.</span><span class="phys"><strong>Tissues:</strong> organized epithelia and extracellular matrix support coordinated contractile, sensory and digestive tissues. Whether the earliest common ancestor already possessed a nervous system is entangled with the unresolved animal-root topology.</span></span></li>
+<li class="row animals" style="--band:#efb8d8"><span class="idx">51</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Animal" rel="noopener" target="_blank">Animalia</a></span><span class="age">animal–choanoflagellate split ≈700–900 Ma in broad molecular-clock estimates</span><span class="gl">Metazoa. Adds sponges and ctenophores. Obligate multicellularity, collagen, a shared developmental toolkit.</span><span class="phys"><strong>Multicellular animals:</strong> a blastula-based life cycle, collagen-rich extracellular matrix, stable cell adhesion, cell–cell signaling, apoptosis and differentiated cell types become integrated into one reproducing organism.</span></span></li>
+<li class="row animals" style="--band:#efb8d8"><span class="idx">52</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Choanozoa" rel="noopener" target="_blank">Choanozoa</a></span><span class="age">≈850 Ma–1.0 Ga</span><span class="gl">Adds choanoflagellates, the closest living single-celled relatives of animals. Their collar-and-flagellum cell is almost indistinguishable from a sponge choanocyte.</span><span class="phys"><strong>Before animals:</strong> choanoflagellates use a collar-and-flagellum feeding cell strikingly similar to sponge choanocytes. Cell-adhesion, extracellular-matrix and signaling domains existed before animals and were later rewired for stable multicellularity.</span></span></li>
+<li class="row animals" style="--band:#efb8d8"><span class="idx">53</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Filozoa" rel="noopener" target="_blank">Filozoa</a></span><span class="age">≈900 Ma–1.05 Ga</span><span class="gl">Adds Filasterea.</span><span class="phys"><strong>Cell movement and signaling:</strong> actin-rich filose protrusions, phagotrophy and adhesion/signaling machinery characterize this neighborhood of the animal stem. Much of the molecular machinery later used for tissues predates tissues.</span></span></li>
+<li class="row animals" style="--band:#efb8d8"><span class="idx">54</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Holozoa" rel="noopener" target="_blank">Holozoa</a></span><span class="age">≈1.0–1.2 Ga</span><span class="gl">Adds ichthyosporeans and corallochytreans.</span><span class="phys"><strong>Early holozoans:</strong> living unicellular holozoans can form colonies or multicellular stages and possess integrin/cadherin-related adhesion, tyrosine-kinase signaling, cell differentiation and programmed-cell-death machinery.</span></span></li>
+<li class="band" data-nofilter="1" style="--band:#f0a985"><span class="band-label">Eukaryotes</span></li>
+<li class="row eukaryotes" style="--band:#f0a985"><span class="idx">55</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Opisthokont" rel="noopener" target="_blank">Opisthokonta</a></span><span class="age">animal–fungal deep split ≈1.0–1.3 Ga</span><span class="gl">Adds fungi. Named for the single rear-facing flagellum of the ancestral cell, the same arrangement a human sperm cell still uses.</span><span class="phys"><strong>Posterior flagellum:</strong> the ancestral motile cell bears a single rear-facing flagellum. Human sperm still uses this opisthokont arrangement; fungi and animals are divergent descendants of this deep cellular plan.</span></span></li>
+<li class="row eukaryotes" style="--band:#f0a985"><span class="idx">56</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Obazoa" rel="noopener" target="_blank">Obazoa</a></span><span class="age">≈1.2–1.5 Ga</span><span class="gl">Adds apusomonads and breviates.</span><span class="phys"><strong>Deep eukaryotic branch:</strong> the common ancestor already had a fully eukaryotic cytoskeleton, mitochondria and endomembranes. No single additional human physiological feature can be confidently pinned to this branch.</span></span></li>
+<li class="row eukaryotes" style="--band:#f0a985"><span class="idx">57</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Amorphea" rel="noopener" target="_blank">Amorphea</a></span><span class="age">≈1.3–1.6 Ga</span><span class="gl">Adds Amoebozoa.</span><span class="phys"><strong>Flexible eukaryotic cells:</strong> actin-driven crawling, shape change and phagocytic behavior are common in this broad branch. The node is more important for eukaryote relationships than for one diagnostic organelle.</span></span></li>
+<li class="row eukaryotes contested" style="--band:#f0a985"><span class="idx">58</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Podiata" rel="noopener" target="_blank">Podiata</a></span><span class="tag warn">contested</span><span class="age">no stable date: the clade itself is not consistently recovered</span><span class="gl">Cavalier-Smith's grouping of Amorphea with several small flagellate lineages. Not consistently recovered by later analyses; provisional.</span><span class="phys"><strong>Provisional grouping:</strong> The grouping is recovered inconsistently, so no distinctive physiology can be assigned to it with confidence. It is best treated as a provisional hypothesis of relationship.</span></span></li>
+<li class="row eukaryotes" style="--band:#f0a985"><span class="idx">59</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Eukaryote" rel="noopener" target="_blank">Eukaryota</a></span><span class="tag">mitochondrial graft</span><span class="age">LECA commonly placed ≈1.6–2.0 Ga; published broader ranges extend roughly ≈1.2–2.3 Ga</span><span class="gl">Nucleus, endomembrane system, cytoskeleton, and ancestrally mitochondria. At this point the host lineage is joined by the bacterial ancestry of mitochondria.</span><span class="phys"><strong>The eukaryotic cell:</strong> nucleus, linear chromosomes with telomeres, spliceosome, endomembrane system, dynamic actin/tubulin cytoskeleton, mitochondria and meiotic sex were already present by LECA. Mitochondrial respiration dramatically expands the energetic architecture available to large genomes and complex cells.</span></span></li>
+<li class="band" data-nofilter="1" style="--band:#f2cb7e"><span class="band-label">Archaea and LUCA</span></li>
+<li class="row archaea contested" style="--band:#f2cb7e"><span class="idx">60</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Hodarchaeum" rel="noopener" target="_blank">Eukaryota + Hodarchaeales</a></span><span class="tag warn">contested</span><span class="age">no secure clock; this is a disputed topology, not a well-dated fossil split</span><span class="gl">Under Eme et al. (2023), eukaryotes are the sister lineage of the asgard order Hodarchaeales. Directly contested; see the note below this list.</span><span class="phys"><strong>A proposed relationship:</strong> this proposed sister relationship locates the host lineage; it does not imply that Hodarchaeales looked like proto-eukaryotes or had nuclei and mitochondria.</span></span></li>
+<li class="row archaea contested" style="--band:#f2cb7e"><span class="idx">61</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Heimdallarchaeia" rel="noopener" target="_blank">Heimdallarchaeia</a></span><span class="tag warn">contested</span><span class="age">no secure absolute date; deep archaeal clocks are highly model-sensitive</span><span class="gl">The asgard class that contains Hodarchaeales.</span><span class="phys"><strong>Near the host lineage:</strong> genomes contain combinations of eukaryotic-signature proteins and distinctive metabolism, but no living member is a “missing link.” The precise eukaryote attachment point remains contested.</span></span></li>
+<li class="row archaea" style="--band:#f2cb7e"><span class="idx">62</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Asgard_archaea" rel="noopener" target="_blank">Asgard archaea</a></span><span class="age">no secure absolute date; likely long before LECA, but current clocks are broad</span><span class="gl">Formally the phylum Promethearchaeota, kingdom Promethearchaeati. Contains Lokiarchaeia, Thorarchaeia, Odinarchaeia, Heimdallarchaeia and others; their genomes carry many proteins once thought exclusive to eukaryotes.</span><span class="phys"><strong>Asgard cell biology:</strong> Cultivated Asgard archaea possess an actin-based cytoskeleton, branched cell protrusions and eukaryote-related ESCRT and ubiquitin machinery. Recent phylogenomics also finds unusually high gene duplication alongside horizontal transfer. These cells still lack a nucleus and mitochondria.</span></span></li>
+<li class="row archaea" style="--band:#f2cb7e"><span class="idx">63</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Thermoproteati" rel="noopener" target="_blank">Asgard + TACK (Proteoarchaeota)</a></span><span class="age">no secure absolute date; deep archaeal branching is poorly calibrated</span><span class="gl">Asgard archaea plus the TACK group: Thaumarchaeota, Aigarchaeota, Crenarchaeota, Korarchaeota.</span><span class="phys"><strong>Deep archaeal machinery:</strong> Sophisticated DNA replication, transcription, translation and membrane-remodeling systems were already present. Eukaryotes later elaborated many of these inherited components.</span></span></li>
+<li class="row archaea" style="--band:#f2cb7e"><span class="idx">64</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Archaea" rel="noopener" target="_blank">Archaea</a></span><span class="age">Bacteria–Archaea divergence approaches the age of LUCA and is not independently well dated</span><span class="gl">In the two-domain tree, eukaryotes sit inside Archaea rather than beside it. Ether-linked membrane lipids, eukaryote-like transcription and translation machinery.</span><span class="phys"><strong>Archaeal cells:</strong> Ether-linked isoprenoid membranes, histone-based DNA packaging in many groups, and transcription and translation machinery that more closely resemble eukaryotes than bacteria mark the archaeal branch. In two-domain trees, this is the host-side ancestry of the eukaryotic nucleus.</span></span></li>
+<li class="row archaea endpoint" style="--band:#f2cb7e"><span class="idx">65</span><span class="sym">⊂</span><span class="body"><span class="nm"><a href="https://en.wikipedia.org/wiki/Last_universal_common_ancestor" rel="noopener" target="_blank">LUCA</a></span><span class="age">≈4.2 Ga in a 2024 integrated molecular/palaeobiological reconstruction</span><span class="gl">The last common ancestor of everything cellular that is alive now. Moody et al. (2024) reconstruct it as an anaerobic acetogen with a genome around 2.5 Mb, already part of an ecosystem. Its other descendant branch is Bacteria.</span><span class="phys"><strong>LUCA:</strong> universal genetic code, ribosomes, tRNAs, ATP-powered bioenergetics, DNA/RNA/protein machinery and ion-gradient metabolism were already established. The 2024 reconstruction suggests an anaerobic acetogen in an ecosystem; its membrane chemistry and exact cell envelope remain uncertain, so do not picture LUCA as a modern bacterium.</span></span></li>
+</ol>
+<p class="legend" style="margin-top:12px">Date windows are approximate synthesis ranges, not 65 independent measurements. 
+      ka = thousand years, Ma = million years, Ga = billion years.
+      Entries 60–65 are the least settled part of the list; the
+      <a href="#forks">contested nodes</a> section sets out the competing trees.
+    </p>
+</section>
+<section id="reading">
+<h2>How to read it</h2>
+<div class="cards">
+<article class="card">
+<h3>⊂ means “is contained in”</h3>
+<p>If A ⊂ B, every member of A also belongs to B. Moving down the list adds more distant relatives. Step 5 brings in gorillas; step 43, lampreys; step 52, choanoflagellates.</p>
+</article>
+<article class="card">
+<h3>Crown and stem</h3>
+<p>A crown group contains the last common ancestor of its living members and all descendants of that ancestor. Stem groups include extinct relatives that branched off earlier. Mammaliaformes and Mammaliamorpha are therefore broader than Mammalia.</p>
+</article>
+<article class="card">
+<h3>Fossils named here are cousins</h3>
+<p><em>Tiktaalik</em>, <em>Dimetrodon</em> and <em>Thrinaxodon</em> are close relatives of branches in this lineage, not named links in a chain of direct ancestors. Their fossils show what bodies in those parts of the tree looked like.</p>
+</article>
+<article class="card">
+<h3>Names are unstable</h3>
+<p>Clade names change as new fossils and genetic analyses alter the tree. Teleostomi has lost usefulness as acanthodians moved toward the shark side of the tree; Hominina, Podiata and Primatomorpha are also used differently by different authors. The names are labels on a changing scientific map.</p>
+</article>
+</div>
+</section><section id="systems">
+<h2>Seven systems through deep time</h2>
+<p class="lede">The same history can be followed organ by organ. Bones, teeth, lungs, reproduction, senses, immunity and the cell itself each carry structures inherited from much older forms of life.</p>
+<div class="systems">
+<article class="system"><h3>1 · Skeleton &amp; locomotion</h3><ol>
+<li><time>≈425–400 Ma</time> lobe fins acquire the internal one-bone/two-bone architecture later reused in limbs.</li>
+<li><time>≈390–360 Ma</time> neck, wrists/ankles, digits, stronger ribs and a weight-transmitting pelvis emerge in aquatic-to-shallow-water tetrapodomorphs.</li>
+<li><time>≈320 Ma</time> amniotes become fully terrestrial; later synapsids progressively bring limbs under the body.</li>
+<li><time>≈4–3 Ma</time> habitual hominin bipedality reshapes pelvis, knee and foot.</li>
+<li><time>≈2 Ma</time> Homo evolves long legs and a spring-loaded, endurance-capable striding body.</li>
+</ol></article>
+<article class="system"><h3>2 · Teeth, jaw &amp; hearing</h3><ol>
+<li><time>≈450 Ma</time> jaws arise from anterior pharyngeal-arch structures in gnathostomes.</li>
+<li><time>≈300–250 Ma</time> synapsid teeth differentiate and chewing becomes increasingly precise.</li>
+<li><time>≈260–200 Ma</time> the dentary enlarges; postdentary bones shrink; the new dentary–squamosal jaw joint takes over.</li>
+<li><time>≈200–120 Ma</time> ancestral jaw-joint bones detach and become the malleus and incus, producing the mammalian three-ossicle middle ear.</li>
+<li><time>≈3 Ma–present</time> Homo trends toward smaller molars, lighter faces and reduced chewing musculature as diet and food processing change.</li>
+</ol></article>
+<article class="system"><h3>3 · Breathing, circulation &amp; heat</h3><ol>
+<li><time>≈430 Ma+</time> bony vertebrates possess a pharyngeal gas-organ system; the sarcopterygian branch elaborates lungs.</li>
+<li><time>≈370–320 Ma</time> tetrapods shift ventilation and circulation toward sustained air breathing; amniotes refine rib ventilation and water balance.</li>
+<li><time>≈280–200 Ma</time> therapsid/cynodont posture, secondary palate and nasal anatomy support rising sustained aerobic capacity; mammalian endothermy is assembled gradually.</li>
+<li><time>≈2 Ma?</time> Homo likely intensifies eccrine sweating and reduces body hair, allowing sustained activity in heat. The timing is inferred, not fossil-observed.</li>
+</ol></article>
+<article class="system"><h3>4 · Reproduction &amp; development</h3><ol>
+<li><time>≈320 Ma</time> amniotic membranes let embryos develop away from open water.</li>
+<li><time>≈200 Ma+</time> mammary secretion, hair and prolonged parental investment are integrated into mammalian reproduction.</li>
+<li><time>≈180–160 Ma</time> therians move to live birth; eutherians and metatherians diverge.</li>
+<li><time>≈100 Ma+</time> crown placentals elaborate prolonged gestation and maternal–fetal exchange.</li>
+<li><time>Homo</time> childhood and dependency become exceptionally prolonged, moving a larger fraction of adaptation into learning after birth.</li>
+</ol></article>
+<article class="system"><h3>5 · Brain &amp; senses</h3><ol>
+<li><time>≈520–500 Ma</time> vertebrate neural crest and cranial placodes build a new sensory head: inner ear, olfactory structures, cranial ganglia, facial skeleton and more.</li>
+<li><time>≈70–40 Ma</time> primates emphasize stereoscopic vision and grasping; anthropoids increase visual specialization and brain size.</li>
+<li><time>≈43–31 Ma</time> stem catarrhines acquire routine red–green trichromacy through opsin-gene duplication.</li>
+<li><time>≈3 Ma–present</time> Homo encephalization accelerates overall, but with reversals and overlap; neural reorganization and cultural inheritance prevent “brain size” from being the whole story.</li>
+</ol></article>
+<article class="system"><h3>6 · Immunity</h3><ol>
+<li><time>&gt;600 Ma</time> innate immune recognition is already ancient in animals.</li>
+<li><time>≈520–500 Ma</time> vertebrates possess B-like and T-like lymphocyte lineages; jawless vertebrates evolve a VLR-based adaptive system.</li>
+<li><time>≈500–450 Ma</time> jawed vertebrates acquire the RAG/V(D)J, immunoglobulin/T-cell-receptor and MHC system that humans still use.</li>
+<li><time>primates–humans</time> the same ancient architecture keeps coevolving with pathogens; much of immune evolution is recent and population-specific rather than a new clade-level organ.</li>
+</ol></article>
+<article class="system"><h3>7 · The cell itself</h3><ol>
+<li><time>≈4.2 Ga</time> LUCA already uses ribosomes, the genetic code, ATP and sophisticated information processing.</li>
+<li><time>deep time</time> Archaea evolve the host-side information-processing architecture inherited by eukaryotes.</li>
+<li><time>pre-LECA</time> Asgard lineages show actin cytoskeletons, protrusions, ESCRT/ubiquitin systems and unusually strong gene duplication.</li>
+<li><time>≈2 Ga</time> an archaeal host and alphaproteobacterial endosymbiont combine; mitochondria emerge and thousands of bacterial genes are integrated into the nuclear lineage.</li>
+<li><time>by LECA</time> nucleus, mitochondria, endomembranes, cytoskeleton, sex and linear chromosomes are already present.</li>
+</ol></article>
+</div>
+<div class="note"><strong>An old body, continually altered.</strong> Human anatomy contains chordate body patterning, vertebrate sensory tissues, ancient jaws and lungs, tetrapod limbs, amniote reproduction, synapsid skull mechanics, mammalian ears and temperature control, primate hands and vision, ape shoulders, hominin bipedality and the later changes of <em>Homo sapiens</em>.</div>
+</section>
+<section id="chapters">
+<h2>Where the great changes occurred</h2>
+<p class="lede">The deepest changes took millions of years and crossed the boundaries of named clades. Fossils catch them in progress: a jaw becoming an ear, a fin becoming a limb, a solitary cell acquiring the means to live as part of an animal.</p>
+<div class="chapter">
+<div>
+<h3><span class="num">1</span>Steps 1–8: inside the apes</h3>
+<p>The names are similar—Hominina, Hominini, Homininae, Hominidae—but the branches span millions of years. When the human line separated from chimpanzees, it remained an ape lineage. The same nesting holds as gorillas, orangutans and gibbons are added farther down the tree.</p>
+<p class="legend">Watch the ordering: <a href="https://en.wikipedia.org/wiki/Hominini" rel="noopener" target="_blank">Hominini</a> (with chimps) ⊂ <a href="https://en.wikipedia.org/wiki/Homininae" rel="noopener" target="_blank">Homininae</a>
+        (with gorillas) ⊂ <a href="https://en.wikipedia.org/wiki/Hominidae" rel="noopener" target="_blank">Hominidae</a> (with orangutans) ⊂ <a href="https://en.wikipedia.org/wiki/Ape" rel="noopener" target="_blank">Hominoidea</a> (with gibbons).</p>
+<div class="mosaic">
+<div><b>Tail</b>Lost on the hominoid stem roughly 25 Ma; humans retain only the coccyx.</div>
+<div><b>Color vision</b>Routine three-cone red–green trichromacy is older than apes, inherited from stem catarrhines.</div>
+<div><b>Bipedality</b>Begins millions of years before Homo and before major brain expansion.</div>
+<div><b>Big brain</b>Accelerates mainly within Homo, not at the human–chimp split.</div>
+<div><b>Hair/sweat</b>Likely shifts strongly with early Homo, but cannot be directly read from bones.</div>
+<div><b>Culture</b>Becomes an inherited environment: tools, fire, food processing and teaching change selection itself.</div>
+</div></div>
+<figure class="visual">
+<img alt="Illustration of human skeleton and internal organs" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/202403_human_anatomy_skeleton_and_organs.svg/960px-202403_human_anatomy_skeleton_and_organs.svg.png"/>
+<figcaption>Step 1. Human anatomy. DataBase Center for Life Science (DBCLS), CC BY 4.0.</figcaption>
+</figure>
+</div>
+<div class="chapter reverse">
+<figure class="visual">
+<img alt="Mounted skeleton of the cynodont Thrinaxodon" src="https://upload.wikimedia.org/wikipedia/commons/0/0d/Thrinaxodon.jpg"/>
+<figcaption><em>Thrinaxodon</em>, a cynodont from the Early Triassic: a close relative of
+        the animals around steps 22–23, not an ancestor. Alannis, CC BY-SA 3.0.</figcaption>
+</figure>
+<div>
+<h3><span class="num">2</span>Steps 9–22: mammal traits arrive piecemeal</h3>
+<p>The familiar mammalian body emerged piece by piece. Across cynodonts and mammaliaforms, the secondary palate, specialized teeth, the dentary–squamosal jaw joint and the transfer of old jaw bones into the middle ear accumulated over roughly eighty million years.</p>
+<p>The ear records the transition with unusual clarity. The articular and quadrate of the old jaw hinge became the malleus and incus. Mammalian embryos still reveal the developmental connection.</p>
+<div class="callout"><h3>A jaw joint becomes an ear</h3><p>Early jawed vertebrates carried several bones in the lower jaw and one main middle-ear ossicle. Mammals ended with a single dentary lower jaw and three ear bones. For tens of millions of years the feeding and hearing systems remained mechanically linked before the middle ear became fully detached.</p></div></div>
+</div>
+<div class="chapter">
+<div>
+<h3><span class="num">3</span>Steps 23–31: the synapsid branch</h3>
+<p><a href="https://en.wikipedia.org/wiki/Synapsida" rel="noopener" target="_blank">Synapsida</a> is the mammal branch of <a href="https://en.wikipedia.org/wiki/Amniote" rel="noopener" target="_blank">Amniota</a>; <a href="https://en.wikipedia.org/wiki/Sauropsida" rel="noopener" target="_blank">Sauropsida</a> contains reptiles and birds. A single temporal opening behind the eye marks the ancestral synapsid skull. <em>Dimetrodon</em>, often mistaken for a dinosaur, belongs on our side of this ancient division.</p>
+<p>The old phrase “mammal-like reptile” obscures the relationship. These animals belonged to the synapsid line, the branch that eventually produced mammals.</p>
+<div class="callout"><h3>The slow rise of warm-blooded physiology</h3><p>Posture, breathing, nasal anatomy, bone growth, insulation, metabolic rate and reproduction did not change together. Evidence for sustained high activity and temperature control accumulates across therapsids, cynodonts and mammaliaforms, long before the first crown mammals.</p></div></div>
+<figure class="visual">
+<img alt="Mounted Dimetrodon skeleton with tall dorsal sail" src="https://upload.wikimedia.org/wikipedia/commons/8/88/Gfp-dimetrodon-skeleton.jpg"/>
+<figcaption><em>Dimetrodon</em>, a sphenacodont synapsid, around step 27. Yinan Chen,
+        public domain.</figcaption>
+</figure>
+</div>
+<div class="chapter reverse">
+<figure class="visual">
+<img alt="Reconstruction drawing of Tiktaalik" src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Tiktaalik.png"/>
+<figcaption><em>Tiktaalik roseae</em>, a close relative of the animals at step 34.
+        Drawing by Dave souza, CC BY-SA 2.5.</figcaption>
+</figure>
+<div>
+<h3><span class="num">4</span>Steps 32–38: fins to limbs</h3>
+<p>The pattern inside the human arm—one upper bone, two forearm bones, wrist and digits—has roots in lobe-finned fishes. A humerus, radius and ulna can already be recognized in <em>Eusthenopteron</em>, an animal that never left the water.</p>
+<p><em>Acanthostega</em> carried eight digits on each limb while retaining internal gills and a fin-rayed tail. Limbs and digits first evolved in water; effective life on land came later.</p>
+<div class="callout"><h3>Limbs began in water</h3><p>Digits and weight-bearing joints first appeared in animals that remained largely aquatic. Lungs were older still. The move onto land depended on modifying structures already present in shallow-water vertebrates.</p></div></div>
+</div>
+<div class="chapter">
+<div>
+<h3><span class="num">5</span>Steps 39–45: jaws, spine, notochord</h3>
+<p>Farther back lie the great vertebrate inventions: mineralized skeleton, jaws, vertebrae and the chordate body axis. The jaw arose from anterior pharyngeal arches, a developmental history still reflected in the shared genetics of jaw and ear formation.</p>
+<p>Tunicates—not lancelets—are the closest living relatives of vertebrates. Adult sea squirts scarcely look the part, but their larvae carry a notochord and dorsal nerve cord before absorbing them during metamorphosis.</p>
+<div class="callout"><h3>The vertebrate face is built by wandering cells</h3><p>Neural crest cells migrate through the embryo to help form jaws, facial bones, teeth, pigment cells, peripheral nerves and parts of the heart and endocrine system. Cranial placodes form major sensory structures. Much of the vertebrate head begins as a developmental migration before it becomes bone and tissue.</p></div></div>
+<figure class="visual">
+<img alt="Line drawing of a coelacanth" src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Coelacanth.png"/>
+<figcaption>A coelacanth: a surviving sarcopterygian on the non-tetrapod side of step 38.
+        FishBase, public domain.</figcaption>
+</figure>
+</div>
+<div class="chapter reverse">
+<figure class="visual">
+<img alt="Comparison of a choanoflagellate cell and a sponge choanocyte" src="https://upload.wikimedia.org/wikipedia/commons/e/e9/Choanoflagellate_and_choanocyte.png"/>
+<figcaption>A choanoflagellate beside a sponge choanocyte, step 52. Clark MA, Choi J and
+        Douglas M (OpenStax Biology 2e), CC BY 4.0.</figcaption>
+</figure>
+<div>
+<h3><span class="num">6</span>Steps 46–54: out of the animals</h3>
+<p>Beyond Animalia lie mostly single-celled relatives: choanoflagellates, filastereans and ichthyosporeans. Several can form temporary colonies and carry genes for adhesion and signaling that once seemed peculiar to animals.</p>
+<p>The molecular equipment for cells to adhere, communicate and change state existed before permanent animal bodies. Animal evolution brought those behaviors under a stable developmental program.</p>
+<div class="callout"><h3>The machinery for animals came first</h3><p>Choanoflagellates, filastereans and other holozoans already possessed molecular systems for adhesion, signaling, differentiation and programmed cell death. In animals, ancient cell behaviors became coordinated across a permanent multicellular body.</p></div></div>
+</div>
+<div class="chapter">
+<div>
+<h3><span class="num">7</span>Steps 55–59: into the eukaryotic cell</h3>
+<p>At this depth the subject is no longer an animal body but the architecture of the cell: nucleus, internal membranes, cytoskeleton and mitochondria. Opisthokonts—animals, fungi and their relatives—take their name from the ancestral rear-facing flagellum, an arrangement still seen in human sperm.</p>
+<p><a href="https://en.wikipedia.org/wiki/Eukaryogenesis#Last_eukaryotic_common_ancestor_(LECA)" rel="noopener" target="_blank">LECA</a>, the last eukaryotic common ancestor, already possessed a nucleus, mitochondria, linear chromosomes with telomeres, internal membranes and sexual reproduction. The earlier steps between an archaeal host and LECA are inferred from genomes and cell biology.</p>
+<div class="callout"><h3>LECA was already an elaborate cell</h3><p>By the time living eukaryotic lineages began to diverge, their common ancestor already had a nucleus, mitochondria, cytoskeleton, endomembranes, linear chromosomes, telomeres and meiotic sex. The origin of these systems lies deeper on the eukaryotic stem.</p></div></div>
+<figure class="visual">
+<img alt="Labelled diagram of a typical animal cell" src="https://upload.wikimedia.org/wikipedia/commons/1/11/Animal_Cell.svg"/>
+<figcaption>Typical animal cell; mitochondria are label 9. Kelvinsong, CC0.</figcaption>
+</figure>
+</div>
+<div class="chapter reverse">
+<figure class="visual">
+<img alt="Diagram of metabolic capabilities of Asgard archaea across environments" src="https://upload.wikimedia.org/wikipedia/commons/2/22/Asgard_archaea_in_various_environments.png"/>
+<figcaption>Metabolic capabilities of Asgard archaea across environmental samples. MacLeod,
+        Kindler, Wong, Chen &amp; Burns, CC BY 4.0.</figcaption>
+</figure>
+<div>
+<h3><span class="num">8</span>Steps 60–65: archaea and LUCA</h3>
+<p>In the two-domain tree, eukaryotes arise from within Archaea. Asgard archaea occupy the closest known prokaryotic neighborhood to that origin, placing the deepest division in this history between the bacterial and archaeal branches descending from LUCA.</p>
+<p>A 2024 reconstruction places LUCA at roughly 4.2 billion years ago, only a few hundred million years after Earth formed. The study inferred a genome of about 2.5 megabases and roughly 2,600 proteins, an anaerobic acetogenic metabolism and an ecosystem already containing other lineages.</p>
+<div class="callout"><h3>Asgard archaea and the eukaryotic origin</h3><p>Phylogenomic work continues to place Asgard archaea close to the origin of eukaryotes. Their genomes show extensive horizontal gene transfer as well as unusually high rates of gene duplication, helping explain their large molecular repertoire. The exact branch from which eukaryotes arose remains unsettled.</p></div></div>
+</div>
+</section>
+<section id="graft">
+<h2>The mitochondrial graft</h2>
+<p class="lede">At the origin of eukaryotes, a simple branching tree is no longer enough. The cell that eventually gave rise to animals joined two ancient lineages.</p>
+<div class="graft">
+<div class="node"><strong>Archaeal host lineage</strong><br/>
+<span class="legend">nuclear genome, ribosomes, transcription machinery, membrane trafficking</span></div>
+<div class="arrow">+</div>
+<div class="node"><strong>Alphaproteobacterial endosymbiont</strong><br/>
+<span class="legend">mitochondria, oxidative phosphorylation, ~1,000 genes relocated to the nucleus</span></div>
+</div>
+<p>The human mitochondrial genome is a bacterial remnant only 16,569 base pairs long. Most genes once carried by the endosymbiont moved into the nucleus during eukaryotic evolution, leaving bacterial and archaeal histories intertwined within the same cell.</p>
+<p>The main list follows the host lineage through the nuclear genome into Archaea. The mitochondrial branch enters from Alphaproteobacteria and therefore appears beside, rather than within, the nested chain.</p>
+<div class="callout"><h3>Here the tree becomes a network</h3><p>The nuclear lineage points into Archaea; the mitochondrion points into Bacteria. Gene transfer later moved much of the mitochondrial genome into the nucleus. Every human cell carries the record of that ancient merger.</p></div></section>
+<section id="forks">
+<h2>Contested nodes</h2>
+<p class="lede">Nine entries are marked contested because the branching order, definition or usefulness of the clade remains disputed.</p>
+<table class="forks">
+<thead><tr><th>Step</th><th>Question</th><th>State of play</th></tr></thead>
+<tbody>
+<tr><td>3</td><td>Hominina</td>
+<td>Whether the subtribe is worth recognising at all, and whether it includes
+        <em>Australopithecus</em>. Many classifications go straight from Homo to Hominini.</td></tr>
+<tr><td>12</td><td>Primatomorpha vs Sundatheria</td>
+<td>Do colugos pair with primates, or with treeshrews? Morphology and molecules have
+        disagreed repeatedly.</td></tr>
+<tr><td>31</td><td>Reptiliomorpha</td>
+<td>Two incompatible definitions in circulation, one including amniotes and one excluding
+        them. Check which an author means before comparing sources.</td></tr>
+<tr><td>40</td><td>Teleostomi</td>
+<td>Built on acanthodians being close to bony fish. Recent analyses put acanthodians on the
+        chondrichthyan stem instead, which leaves the name with nothing distinct to do.</td></tr>
+<tr><td>46</td><td>Deuterostomia</td>
+<td>The developmental definition has failed; blastopore fate is not consistent across the
+        group. Some phylogenomic analyses no longer recover Deuterostomia as monophyletic at
+        all.</td></tr>
+<tr><td>50</td><td>Eumetazoa</td>
+<td>Depends on whether sponges or ctenophores are the sister group to all other animals.
+        The ctenophore-first result keeps recurring in genome-scale analyses; the argument is about
+        systematic error, not data volume.</td></tr>
+<tr><td>58</td><td>Podiata</td>
+<td>Cavalier-Smith's grouping. Not reliably recovered by later work, and often omitted from
+        eukaryote classifications entirely.</td></tr>
+<tr><td>60–61</td><td>Where eukaryotes attach in the Asgard tree</td>
+<td>See below. This is the live one.</td></tr>
+</tbody>
+</table>
+<div class="note warn" style="margin-top:22px">
+<h3 style="margin-top:0">The Asgard question</h3>
+<p>Several placements still have serious support, and no single topology has ended the debate:</p>
+<ul>
+<li><strong>Hodarchaeales-sister.</strong> <a href="https://doi.org/10.1038/s41586-023-06186-2" rel="noopener" target="_blank">Eme and colleagues</a> (Nature, 2023) place eukaryotes as
+        the sister lineage of Hodarchaeales, an order within Heimdallarchaeia. This is what steps
+        60–61 of the list encode.</li>
+<li><strong>Outside Heimdallarchaeia.</strong> Zhang and colleagues (Nature, 2025) recover
+        eukaryotes branching deeper in the Asgard tree, outside Heimdallarchaeia altogether. If
+        that holds, step 61 drops out.</li>
+<li><strong>Three domains.</strong> Forterre (2025) argues that the eukaryote–Asgard
+        signal reflects extensive lateral gene transfer between proto-eukaryotes and
+        Heimdallarchaeia rather than direct descent, and that the eukaryotes-inside-Archaea result
+        appears in a minority of individual marker trees. Under this reading the two-domain tree
+        is an artefact and Eukaryota remains a separate domain.</li>
+</ul>
+<p style="margin-bottom:0">Recent phylogenomic analyses continue to place Asgard archaea as the closest known prokaryotic relatives of eukaryotes, while disagreeing over the exact point of attachment. Some recover eukaryotes within or beside Heimdallarchaeia; others place the origin deeper in Asgard. The page therefore marks this part of the tree as unresolved.</p>
+</div>
+<figure class="visual" style="margin-top:24px">
+<img alt="Universal tree of life showing bacteria, archaea and eukaryotes" src="https://upload.wikimedia.org/wikipedia/commons/f/f8/Tree_of_Life_-_2016.svg"/>
+<figcaption>A universal tree drawn after Forterre (2015), showing eukaryotes as a separate
+      domain. Included as the counterpoint to the two-domain arrangement the list follows.
+      Asw-hamburg, CC BY-SA 4.0.</figcaption>
+</figure>
+</section>
+<section id="backbone">
+<h2>A shorter backbone</h2>
+<p class="lede">The full chain is meant for reference. For memory, these larger landmarks give the shape of the lineage; the finer clades can be fitted between them.</p>
+<div class="card">
+<p style="font-size:1.03rem;line-height:1.9;margin:0">
+<a href="https://en.wikipedia.org/wiki/Human" rel="noopener" target="_blank">Homo sapiens</a> → <a href="https://en.wikipedia.org/wiki/Ape" rel="noopener" target="_blank">Hominoidea</a> → <a href="https://en.wikipedia.org/wiki/Primate" rel="noopener" target="_blank">Primates</a> → <a href="https://en.wikipedia.org/wiki/Placentalia" rel="noopener" target="_blank">Placentalia</a> →
+      <a href="https://en.wikipedia.org/wiki/Mammal" rel="noopener" target="_blank">Mammalia</a> → <a href="https://en.wikipedia.org/wiki/Cynodontia" rel="noopener" target="_blank">Cynodontia</a> → <a href="https://en.wikipedia.org/wiki/Synapsida" rel="noopener" target="_blank">Synapsida</a> → <a href="https://en.wikipedia.org/wiki/Amniote" rel="noopener" target="_blank">Amniota</a> →
+      <a href="https://en.wikipedia.org/wiki/Tetrapod" rel="noopener" target="_blank">Tetrapoda</a> → <a href="https://en.wikipedia.org/wiki/Sarcopterygii" rel="noopener" target="_blank">Sarcopterygii</a> → <a href="https://en.wikipedia.org/wiki/Osteichthyes" rel="noopener" target="_blank">Osteichthyes</a> →
+      <a href="https://en.wikipedia.org/wiki/Gnathostomata" rel="noopener" target="_blank">Gnathostomata</a> → <a href="https://en.wikipedia.org/wiki/Vertebrate" rel="noopener" target="_blank">Vertebrata</a> → <a href="https://en.wikipedia.org/wiki/Chordate" rel="noopener" target="_blank">Chordata</a> →
+      <a href="https://en.wikipedia.org/wiki/Bilateria" rel="noopener" target="_blank">Bilateria</a> → <a href="https://en.wikipedia.org/wiki/Animal" rel="noopener" target="_blank">Animalia</a> → <a href="https://en.wikipedia.org/wiki/Choanozoa" rel="noopener" target="_blank">Choanozoa</a> → <a href="https://en.wikipedia.org/wiki/Holozoa" rel="noopener" target="_blank">Holozoa</a> →
+      <a href="https://en.wikipedia.org/wiki/Opisthokont" rel="noopener" target="_blank">Opisthokonta</a> → <a href="https://en.wikipedia.org/wiki/Eukaryote" rel="noopener" target="_blank">Eukaryota</a> → <a href="https://en.wikipedia.org/wiki/Asgard_archaea" rel="noopener" target="_blank">Asgard archaea</a> → <a href="https://en.wikipedia.org/wiki/Archaea" rel="noopener" target="_blank">Archaea</a> →
+      <a href="https://en.wikipedia.org/wiki/Last_universal_common_ancestor" rel="noopener" target="_blank">LUCA</a>
+</p>
+</div>
+</section>
+<section class="card"><h3>Where the evidence is strongest</h3><p><strong>High confidence:</strong> the broad nesting of humans within mammals, tetrapods, vertebrates, animals and eukaryotes; major homologies such as limb bones, jaw-to-ear bones and chordate development; mammalian lactation; and the bacterial origin of mitochondria. <strong>Moderate confidence:</strong> many molecular split ranges and reconstructions of ancestral physiology. <strong>Active debate:</strong> several deep dates and named clades, the animal root, parts of deuterostome phylogeny and the exact Asgard branch closest to eukaryotes.</p><p>The record is sharp in some places and hazy in others. Fossils, embryos, genomes and living organisms overlap to give a remarkably detailed history, while the oldest branches remain open to revision.</p></section></div>
+</main>
+<footer id="sources">
+<div class="wrap">
+<h3>Key literature</h3>
+<ul>
+<li>Moody, E. R. R. <em>et al.</em> (2024). The nature of the last universal common ancestor
+      and its impact on the early Earth system. <em>Nature Ecology &amp; Evolution</em> 8,
+      1654–1666.
+      <a href="https://doi.org/10.1038/s41559-024-02461-1" rel="noopener" target="_blank">doi:10.1038/s41559-024-02461-1</a></li>
+<li>Eme, L., Tamarit, D., Caceres, E. F. <em>et al.</em> (2023). Inference and reconstruction
+      of the heimdallarchaeial ancestry of eukaryotes. <em>Nature</em> 618, 992–999.
+      <a href="https://doi.org/10.1038/s41586-023-06186-2" rel="noopener" target="_blank">doi:10.1038/s41586-023-06186-2</a></li>
+<li>Zhang, J. <em>et al.</em> (2025). Deep origin of eukaryotes outside Heimdallarchaeia
+      within Asgardarchaeota. <em>Nature</em> 642, 990–998.
+      <a href="https://doi.org/10.1038/s41586-025-08955-7" rel="noopener" target="_blank">doi:10.1038/s41586-025-08955-7</a></li>
+<li>Forterre, P. (2025). Extensive lateral gene transfer between proto-eukaryotes and
+      Heimdallarchaeia suggests their close association during eukaryogenesis. <em>mLife</em>.
+      <a href="https://doi.org/10.1002/mlf2.70030" rel="noopener" target="_blank">doi:10.1002/mlf2.70030</a></li>
+<li>Xia, B. <em>et al.</em> (2024). On the genetic basis of tail-loss evolution in humans and apes. <em>Nature</em> 626, 1042–1048. <a href="https://doi.org/10.1038/s41586-024-07095-8" rel="noopener" target="_blank">DOI</a></li><li>Venkadesan, M. <em>et al.</em> (2020). Stiffness of the human foot and evolution of the transverse arch. <em>Nature</em> 579, 97–100. <a href="https://doi.org/10.1038/s41586-020-2053-y" rel="noopener" target="_blank">DOI</a></li><li>Bramble, D. M. &amp; Lieberman, D. E. (2004). Endurance running and the evolution of Homo. <em>Nature</em> 432, 345–352. <a href="https://doi.org/10.1038/nature03052" rel="noopener" target="_blank">DOI</a></li><li>Hubbe, M. &amp; Harvati, K. (2026). Evolutionary drivers of encephalization and facial reduction in the genus Homo. <em>Nature Communications</em> 17. <a href="https://doi.org/10.1038/s41467-026-74739-w" rel="noopener" target="_blank">DOI</a></li><li>Langergraber, K. E. <em>et al.</em> (2012). Generation times in wild chimpanzees and gorillas suggest earlier divergence times in great ape and human evolution. <em>PNAS</em>. <a href="https://doi.org/10.1073/pnas.1211740109" rel="noopener" target="_blank">DOI</a></li><li>Luo, Z.-X. <em>et al.</em> (2011). A Jurassic eutherian mammal and divergence of marsupials and placentals. <em>Nature</em> 476, 442–445. <a href="https://doi.org/10.1038/nature10291" rel="noopener" target="_blank">DOI</a></li><li>Green, S. A., Simoes-Costa, M. &amp; Bronner, M. E. (2015). Evolution of vertebrates as viewed from the crest. <em>Nature</em> 520, 474–482. <a href="https://doi.org/10.1038/nature14436" rel="noopener" target="_blank">DOI</a></li><li>King, N. <em>et al.</em> (2008). The genome of the choanoflagellate <em>Monosiga brevicollis</em> and the origin of metazoans. <em>Nature</em> 451, 783–788. <a href="https://doi.org/10.1038/nature06617" rel="noopener" target="_blank">DOI</a></li><li>Rodrigues-Oliveira, T. <em>et al.</em> (2023). Actin cytoskeleton and complex cell architecture in an Asgard archaeon. <em>Nature</em> 613, 332–339. <a href="https://doi.org/10.1038/s41586-022-05550-y" rel="noopener" target="_blank">DOI</a></li><li>Manzano-Morales, S. &amp; Gabaldón, T. (2026). Phylogenomics of Asgard archaea reveals a unique blend of prokaryotic-like horizontal transfer and eukaryotic-like gene duplication. <em>Nature Communications</em> 17, 5103. <a href="https://doi.org/10.1038/s41467-026-71534-5" rel="noopener" target="_blank">DOI</a></li><li>Litman, G. W., Rast, J. P. &amp; Fugmann, S. D. (2010). The origins of vertebrate adaptive immunity. <em>Nature Reviews Immunology</em> 10, 543–553. <a href="https://doi.org/10.1038/nri2807" rel="noopener" target="_blank">DOI</a></li></ul>
+<h3>Images</h3>
+<ul class="srcs">
+<li>Human anatomy: DataBase Center for Life Science (DBCLS), CC BY 4.0, Wikimedia Commons.</li>
+<li><em>Thrinaxodon</em> skeleton: Alannis, CC BY-SA 3.0, Wikimedia Commons.</li>
+<li><em>Dimetrodon</em> skeleton: Yinan Chen, public domain, Wikimedia Commons.</li>
+<li><em>Tiktaalik</em>: Dave souza, CC BY-SA 2.5, Wikimedia Commons.</li>
+<li>Coelacanth: FishBase, public domain, Wikimedia Commons.</li>
+<li>Choanoflagellate and choanocyte: Clark MA, Choi J and Douglas M (OpenStax Biology 2e),
+      CC BY 4.0, Wikimedia Commons.</li>
+<li>Animal cell diagram: Kelvinsong, CC0, Wikimedia Commons.</li>
+<li>Asgard archaea metabolism: MacLeod, Kindler, Wong, Chen &amp; Burns, CC BY 4.0,
+      Wikimedia Commons.</li>
+<li>Universal tree of life (2016): Asw-hamburg, CC BY-SA 4.0, Wikimedia Commons, after
+      Forterre (2015).</li>
+<li>Pelvis and birth-canal comparison: ArchaeoMouse, CC BY-SA 4.0, Wikimedia Commons.</li></ul>
+<p>Divergence windows are broad synthesis ranges drawn from fossil constraints and published molecular-clock studies. They are not precise confidence intervals unless a cited source gives one. Anatomical and physiological traits rarely begin exactly at a clade boundary, and the oldest eukaryotic and archaeal dates remain especially sensitive to the models used.</p>
+</div>
+</footer>
+<script>
+(function(){
+  var list  = document.getElementById('chainList');
+  var rows  = Array.prototype.slice.call(list.querySelectorAll('li.row'));
+  var bands = Array.prototype.slice.call(list.querySelectorAll('li.band'));
+  var search = document.getElementById('search');
+  var count  = document.getElementById('count');
+  var bGloss = document.getElementById('toggleGloss');
+  var bCont  = document.getElementById('onlyContested');
+  var bReset = document.getElementById('reset');
+  var contestedOnly = false;
+
+  function apply(){
+    var q = search.value.trim().toLowerCase();
+    var shown = 0;
+    rows.forEach(function(r){
+      var text = r.textContent.toLowerCase();
+      var ok = (!q || text.indexOf(q) !== -1) &&
+               (!contestedOnly || r.classList.contains('contested'));
+      r.classList.toggle('hide', !ok);
+      r.classList.toggle('hit', !!q && ok);
+      if (ok) shown++;
+    });
+    // hide a band header when nothing under it survives
+    bands.forEach(function(b){
+      var n = b.nextElementSibling, any = false;
+      while (n && !n.classList.contains('band')) {
+        if (!n.classList.contains('hide')) { any = true; break; }
+        n = n.nextElementSibling;
+      }
+      b.classList.toggle('hide', !any);
+    });
+    count.textContent = (q || contestedOnly)
+      ? shown + ' of ' + rows.length + ' shown'
+      : rows.length + ' clades';
+  }
+
+  search.addEventListener('input', apply);
+  bGloss.addEventListener('click', function(){
+    var on = document.body.classList.toggle('compact');
+    bGloss.setAttribute('aria-pressed', on ? 'true' : 'false');
+    bGloss.textContent = on ? 'Show anatomy + notes' : 'Names only';
+  });
+  bCont.addEventListener('click', function(){
+    contestedOnly = !contestedOnly;
+    bCont.setAttribute('aria-pressed', contestedOnly ? 'true' : 'false');
+    apply();
+  });
+  bReset.addEventListener('click', function(){
+    search.value = '';
+    contestedOnly = false;
+    bCont.setAttribute('aria-pressed','false');
+    document.body.classList.remove('compact');
+    bGloss.setAttribute('aria-pressed','false');
+    bGloss.textContent = 'Names only';
+    apply();
+  });
+  apply();
+})();
+</script>
+</body>
+</html>
