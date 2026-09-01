@@ -4,24 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The History of You.</title>
+<link rel="stylesheet" href="style.css">
 </head>
-<body style="margin:0;background:#07100f;color:#eef7f3;font-family:Inter,system-ui,sans-serif;padding:2rem">
-<p>Loading The History of You…</p>
-<script>
-(async function(){
-  const names = ["part0.txt","part1.txt","part2.txt","part3.txt"];
-  const parts = [];
-  for (const f of names) {
-    const r = await fetch(f);
-    if (!r.ok) throw new Error(f + " " + r.status);
-    parts.push(await r.text());
-  }
-  document.open();
-  document.write(parts.join(""));
-  document.close();
-})().catch(function(e){
-  document.body.textContent = "Failed to load: " + e;
-});
-</script>
+<body>
+<header class="hero">
+<div class="wrap">
+<div class="eyebrow">GitHub Pages</div>
+<h1>The History of You.</h1>
+<p class="dek">This folder is live on your GitHub Pages site. Drop the full HTML file here to finish publishing the 65-clade guide.</p>
+<div class="note"><strong>One-minute finish.</strong> Open the folder on GitHub, choose <em>Add file → Upload files</em>, and upload <code>The_History_of_You.html</code> as <code>index.html</code> (replace this stub). Pages usually updates within a minute.</div>
+<p style="margin-top:22px"><a href="https://github.com/HiroSakuraba/HiroSakuraba.github.io/tree/main/history-of-you">Open the folder on GitHub</a> · <a href="https://github.com/HiroSakuraba/HiroSakuraba.github.io/upload/main/history-of-you">Upload the HTML</a> · <a href="https://hirosakuraba.github.io/">Back to site home</a></p>
+</div>
+</header>
 </body>
 </html>
