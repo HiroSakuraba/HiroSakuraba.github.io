@@ -84,6 +84,8 @@ Otieno thought for a moment. 400 million-ish tokens on the household pool. The a
 
 The enclosure fans wound down. The house tried to preheat the kitchen and he shut that off.
 
+The house had its own token compute allocation, same as Tony, Ashley, and the school AI nanny. A slice of the household pool that bought artificial intelligence inference by the thousand was billed against a monthly compute cap tied to Otieno’s and Chioma's job board. Local models ran on the wall box and were cheap enough; anything that needed real cloud compute horsepower — like, for instance, a perfectly crafted one-off racing kite drone — cost real tokens.
+
 His wife Chioma was calling.
 
 "Hey, we have an issue. The kids were at the Jeongs' for the splash play date."
@@ -164,7 +166,9 @@ Otieno stopped.
 
 "I only asked you for a price."
 
-"The query went through X settlement. They logged it as a bid. That particular koi lineage is on a Council list. Kenya isn't an approved range."
+"The query went through X settlement. They logged it as a bid. That particular koi lineage is on a Council list. Kenya isn't an approved range," Tony replied.
+
+Now it was common knowledge that legal procedures burned lots of tokens, and those were the same tokens the X company settled on the global ledger and the French Council had now decided to lean on.
 
 Chioma joined the conversation and her transparent visage filled his view.
 
