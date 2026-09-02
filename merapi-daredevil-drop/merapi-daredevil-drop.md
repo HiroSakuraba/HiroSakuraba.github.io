@@ -84,7 +84,7 @@ Otieno thought for a moment. 400 million-ish tokens on the household pool. The a
 
 The enclosure fans wound down. The house tried to preheat the kitchen and he shut that off.
 
-The house had its own token compute allocation, same as Tony, Ashley, and the school AI nanny. A slice of the household pool that bought artificial intelligence inference by the thousand was billed against a monthly compute cap tied to Otieno’s and Chioma's job board. Local models ran on the wall box and were cheap enough; anything that needed real cloud compute horsepower — like, for instance, a perfectly crafted one-off racing kite drone — cost real tokens.
+The house had its own token compute allocation, same as Tony, Ashley, and the school AI nanny. A slice of the household pool that bought artificial intelligence inference by the thousand was billed against a monthly compute cap tied to Otieno's and Chioma's job board. Local models ran on the wall box and were cheap enough; anything that needed real cloud compute horsepower, for instance, a perfectly crafted one-off racing kite drone, cost real tokens.
 
 His wife Chioma was calling.
 
